@@ -1,4 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+int* generate_random_array(int length, int max_num) {
+	int *result = malloc(length * sizeof(int));
+	for (int i = 0; i < length; i++) {
+		result[i] = rand() % 100 + 1;
+	}
+	return result;
+}
 
 void bubble_sort(int num_array[], int length) {
     int done;
@@ -20,9 +29,10 @@ void bubble_sort(int num_array[], int length) {
 }
 
 int main() {
-	int nums[] = {3, 5, 2, 2, 1, 7, 9, 2, 4, 5};
-	bubble_sort(nums, 10);
-	for (int i = 0; i < 10; i++) {
+	srand(0);
+	int *nums = generate_random_array(100, 100);
+	bubble_sort(nums, 100);
+	for (int i = 0; i < 100; i++) {
 		printf("%d\n", nums[i]);
 	}
 }
