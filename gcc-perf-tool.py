@@ -14,6 +14,30 @@ def perf_profile(output_bin):
     print(perf_process.stderr.decode().strip())
     print()
 
+def instrumentalize_binary(source_file, gcc_options, output_bin):
+    print("Compiling with instrumentation profiler...")
+    GCC_INSTRUMENTATION_COMMAND = ["gcc"] + ["-fprofile-generate"] + gcc_options + [source_file] + ["-o"] + [output_bin]
+    
+    gcc_instrumentation_process = subprocess.run(GCC_INSTRUMENTATION_COMMAND, capture_output=True)
+    if gcc_instrumentation_process.returncode != 0:
+        print("gcc-perf-tool: instrumentation compilation error.\noutput:\n")
+        print(gcc_instrumentation_process.stderr.decode().strip())
+        sys.exit(gcc_instrumentation_process.returncode)
+
+    print("Generating profiling data...")
+    subprocess.run(["./" + output_bin], capture_output=True)
+
+    print("Recompiling with profiling data...")
+    GCC_RECOMPILATION_COMMAND = ["gcc"] + ["-fprofile-use"] + gcc_options + [source_file] + ["-o"] + [output_bin]
+
+    gcc_recompilation_process = subprocess.run(GCC_RECOMPILATION_COMMAND, capture_output=True)
+    if gcc_recompilation_process.returncode != 0:
+        print("gcc-perf-tool: recompilation error.\noutput:\n")
+        print(gcc_recompilation_process.stderr.decode().strip())
+        sys.exit(gcc_recompilation_process.returncode)
+
+    perf_profile(output_bin)
+
 def main():
 
     source_file = ""
@@ -59,27 +83,6 @@ def main():
     perf_profile(output_bin)
 
     if instrumentalize:
-        print("Compiling with instrumentation profiler...")
-        GCC_INSTRUMENTATION_COMMAND = ["gcc"] + ["-fprofile-generate"] + gcc_options + [source_file] + ["-o"] + [output_bin]
-        
-        gcc_instrumentation_process = subprocess.run(GCC_INSTRUMENTATION_COMMAND, capture_output=True)
-        if gcc_instrumentation_process.returncode != 0:
-            print("gcc-perf-tool: instrumentation compilation error.\noutput:\n")
-            print(gcc_instrumentation_process.stderr.decode().strip())
-            sys.exit(gcc_instrumentation_process.returncode)
-
-        print("Generating profiling data...")
-        subprocess.run(["./" + output_bin], capture_output=True)
-
-        print("Recompiling with profiling data...")
-        GCC_RECOMPILATION_COMMAND = ["gcc"] + ["-fprofile-use"] + gcc_options + [source_file] + ["-o"] + [output_bin]
-
-        gcc_recompilation_process = subprocess.run(GCC_RECOMPILATION_COMMAND, capture_output=True)
-        if gcc_recompilation_process.returncode != 0:
-            print("gcc-perf-tool: recompilation error.\noutput:\n")
-            print(gcc_recompilation_process.stderr.decode().strip())
-            sys.exit(gcc_recompilation_process.returncode)
-
-        perf_profile(output_bin)
+        instrumentalize_binary(source_file, gcc_options, output_bin)
 
 main()
