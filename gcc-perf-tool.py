@@ -56,7 +56,6 @@ def main():
         sys.exit(gcc_process.returncode)
 
     # Profiling execution
-    print("Profiling...")
     perf_profile(output_bin)
 
     if instrumentalize:
