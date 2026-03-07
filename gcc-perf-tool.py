@@ -38,11 +38,24 @@ def instrumentalize_binary(source_file, gcc_options, output_bin):
 
     perf_profile(output_bin)
 
+def disassemble_function(output_bin, function_name):
+    OBJDUMP_COMMAND = ["objdump", "-d", f"--disassemble={function_name}", output_bin, "-M intel"]
+    objdump_process = subprocess.run(OBJDUMP_COMMAND, capture_output=True)
+    if objdump_process.returncode != 0:
+        print("gcc-perf-tool: objdump error.\noutput:\n")
+        print(gcc_recompilation_process.stderr.decode().strip())
+        sys.exit(gcc_recompilation_process.returncode)
+    
+    print(f"Assembly instructions for {function_name}:")
+    print(objdump_process.stdout.decode().strip())
+
 def main():
 
     source_file = ""
     program_options = []
     gcc_options = []
+    # Will include the name of the function to be disassembled (should you use -d)
+    disassembly_function = ""
 
     for i in range(1, len(sys.argv)):
         if "-" not in sys.argv[i]:
@@ -67,6 +80,12 @@ def main():
                 print("gcc-perf-tool: missing output binary name")
                 sys.exit(-1)
 
+        if option.startswith("-d="):
+            disassembly_function = option.strip().split("=")[1]
+            if disassembly_function == "":
+                print("gcc-perf-tool: missing output binary name")
+                sys.exit(-1)
+
 
     # Binary compilation
     print("Compiling binary...")
@@ -84,5 +103,8 @@ def main():
 
     if instrumentalize:
         instrumentalize_binary(source_file, gcc_options, output_bin)
+
+    if disassembly_function != "":
+        disassemble_function(output_bin, disassembly_function)
 
 main()
