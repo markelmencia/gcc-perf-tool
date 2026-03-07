@@ -97,14 +97,14 @@ def main():
         print("gcc-perf-tool: compilation error.\noutput:\n")
         print(gcc_process.stderr.decode().strip())
         sys.exit(gcc_process.returncode)
+    
+    if disassembly_function != "":
+        disassemble_function(output_bin, disassembly_function)
 
     # Profiling execution
     perf_profile(output_bin)
 
     if instrumentalize:
         instrumentalize_binary(source_file, gcc_options, output_bin)
-
-    if disassembly_function != "":
-        disassemble_function(output_bin, disassembly_function)
 
 main()
