@@ -19,8 +19,10 @@ These options change the behaviour of this tool.
 
 - `-output=<name>`: The compiled binary will have the name specified in this option.
 
+- `-d=<function_name>`: Disassembles `function_name` from the binary with Intel syntax
+
 ### GCC options
 The options specified after the source file will be passed into GCC.
 
 ## Requirements
-This tool will execute instances of `perf` and `gcc`. Having these programs installed on your system is required.
+This tool will execute instances of `perf`, `gcc` and optionally `objdump`. Having these programs installed on your system is required.
