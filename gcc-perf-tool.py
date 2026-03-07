@@ -71,6 +71,7 @@ def main():
 
     # Program options
     instrumentalize = "-i" in program_options
+    no_execute = "-n" in program_options
     
     output_bin = source_file + ".out"
     for option in program_options:
@@ -101,8 +102,10 @@ def main():
     if disassembly_function != "":
         disassemble_function(output_bin, disassembly_function)
 
-    # Profiling execution
-    perf_profile(output_bin)
+    if not no_execute:
+    
+        # Profiling execution
+        perf_profile(output_bin)
 
     if instrumentalize:
         instrumentalize_binary(source_file, gcc_options, output_bin)
