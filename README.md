@@ -21,6 +21,8 @@ These options change the behaviour of this tool.
 
 - `-d=<function_name>`: Disassembles `function_name` from the binary with Intel syntax
 
+- `-n`: Doesn't execute the binary
+
 ### GCC options
 The options specified after the source file will be passed into GCC.
 
